@@ -1,0 +1,39 @@
+{
+  "name": "look-away-reminder",
+  "version": "1.0.0",
+  "description": "Menu bar app to remind you to look away from the screen",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "electron",
+    "menubar",
+    "reminder",
+    "health"
+  ],
+  "author": "",
+  "license": "MIT",
+  "build": {
+    "appId": "com.lookaway.reminder",
+    "productName": "Look Away Reminder",
+    "files": [
+      "main.js",
+      "index.html"
+    ],
+    "mac": {
+      "category": "public.app-category.healthcare-fitness",
+      "target": "dmg"
+    },
+    "dmg": {
+      "title": "Look Away Reminder",
+      "icon": false
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^26.0.12"
+  }
+}

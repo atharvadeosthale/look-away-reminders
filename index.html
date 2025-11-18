@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Look Away Reminder</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #ffffff;
+      color: #333;
+      padding: 16px;
+      user-select: none;
+    }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1a1a1a;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-label {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #007AFF;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .interval-selector {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .interval-btn {
+      padding: 6px 12px;
+      border: 1px solid #d1d1d6;
+      background: #f2f2f7;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .interval-btn:hover {
+      background: #e5e5ea;
+    }
+
+    .interval-btn.active {
+      background: #007AFF;
+      color: white;
+      border-color: #007AFF;
+    }
+
+    .reminder-view {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .reminder-view.active {
+      display: block;
+    }
+
+    .reminder-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .reminder-message {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #1a1a1a;
+    }
+
+    .reminder-submessage {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #007AFF;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0051D5;
+    }
+
+    .settings-view {
+      display: block;
+    }
+
+    .settings-view.hidden {
+      display: none;
+    }
+
+    .quit-btn {
+      margin-top: 12px;
+      background: #f2f2f7;
+      color: #666;
+      font-size: 12px;
+      padding: 8px;
+    }
+
+    .quit-btn:hover {
+      background: #e5e5ea;
+    }
+  </style>
+</head>
+<body>
+  <!-- Settings View -->
+  <div id="settingsView" class="settings-view">
+    <h2>Look Away Reminder</h2>
+
+    <div class="section">
+      <div class="setting-row">
+        <span class="setting-label">Enable Reminders</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="enabledToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Show Timer in Menu Bar</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="showTimerToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="setting-label" style="margin-bottom: 12px;">Remind me every:</div>
+      <div class="interval-selector">
+        <button class="interval-btn" data-minutes="5">5 min</button>
+        <button class="interval-btn" data-minutes="10">10 min</button>
+        <button class="interval-btn" data-minutes="15">15 min</button>
+        <button class="interval-btn active" data-minutes="20">20 min</button>
+        <button class="interval-btn" data-minutes="30">30 min</button>
+        <button class="interval-btn" data-minutes="45">45 min</button>
+        <button class="interval-btn" data-minutes="60">60 min</button>
+      </div>
+    </div>
+
+    <button class="btn quit-btn" id="quitBtn">Quit App</button>
+  </div>
+
+  <!-- Reminder View -->
+  <div id="reminderView" class="reminder-view">
+    <div class="reminder-icon">👀</div>
+    <div class="reminder-message">Time to look away!</div>
+    <div class="reminder-submessage">Give your eyes a break and look at something 20 feet away for 20 seconds.</div>
+    <button class="btn btn-primary" id="dismissBtn">Got it!</button>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const settingsView = document.getElementById('settingsView');
+    const reminderView = document.getElementById('reminderView');
+    const enabledToggle = document.getElementById('enabledToggle');
+    const showTimerToggle = document.getElementById('showTimerToggle');
+    const intervalBtns = document.querySelectorAll('.interval-btn');
+    const dismissBtn = document.getElementById('dismissBtn');
+    const quitBtn = document.getElementById('quitBtn');
+
+    let currentSettings = {
+      enabled: true,
+      interval: 20 * 60 * 1000,
+      showTimer: true
+    };
+
+    // Request initial settings
+    ipcRenderer.send('get-settings');
+
+    // Receive settings
+    ipcRenderer.on('settings-data', (event, settings) => {
+      currentSettings = settings;
+      updateUI();
+    });
+
+    // Show reminder
+    ipcRenderer.on('show-reminder', () => {
+      showReminderView();
+    });
+
+    function updateUI() {
+      enabledToggle.checked = currentSettings.enabled;
+      showTimerToggle.checked = currentSettings.showTimer;
+
+      const minutes = currentSettings.interval / (60 * 1000);
+      intervalBtns.forEach(btn => {
+        const btnMinutes = parseInt(btn.getAttribute('data-minutes'));
+        if (btnMinutes === minutes) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    function showReminderView() {
+      settingsView.classList.add('hidden');
+      reminderView.classList.add('active');
+    }
+
+    function showSettingsView() {
+      reminderView.classList.remove('active');
+      settingsView.classList.remove('hidden');
+    }
+
+    function saveSettings() {
+      ipcRenderer.send('update-settings', currentSettings);
+    }
+
+    // Event listeners
+    enabledToggle.addEventListener('change', (e) => {
+      currentSettings.enabled = e.target.checked;
+      saveSettings();
+    });
+
+    showTimerToggle.addEventListener('change', (e) => {
+      currentSettings.showTimer = e.target.checked;
+      ipcRenderer.send('update-settings', { showTimer: currentSettings.showTimer });
+    });
+
+    intervalBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const minutes = parseInt(btn.getAttribute('data-minutes'));
+        currentSettings.interval = minutes * 60 * 1000;
+
+        intervalBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        saveSettings();
+      });
+    });
+
+    dismissBtn.addEventListener('click', () => {
+      showSettingsView();
+      ipcRenderer.send('dismiss-reminder');
+    });
+
+    quitBtn.addEventListener('click', () => {
+      ipcRenderer.send('quit-app');
+    });
+  </script>
+</body>
+</html>
